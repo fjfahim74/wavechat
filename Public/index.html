@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WaveChat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #dcdcdc;
+      background-image: radial-gradient(#bbb 1px, transparent 1px);
+      background-size: 12px 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Name input screen */
+    .name-screen {
+      width: 320px;
+      height: 320px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .name-screen.active {
+      display: flex;
+    }
+    .name-screen .header {
+      background: #075e54;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      flex-shrink: 0;
+    }
+    .name-input-area {
+      flex: 1;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+    }
+    .name-input-area input {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1.5px solid #ccc;
+      outline: none;
+      transition: border-color 0.3s ease;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      box-sizing: border-box;
+    }
+    .name-input-area input:focus {
+      border-color: #25d366;
+      box-shadow: 0 0 5px #25d366aa;
+    }
+    .name-input-area button {
+      width: 100%;
+      padding: 10px 0;
+      background-color: #25d366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .name-input-area button:hover {
+      background-color: #1da851;
+    }
+
+    /* Chat container */
+    .chat-container {
+      width: 420px;
+      max-width: 95%;
+      height: 520px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chat-container.active {
+      display: flex;
+    }
+
+    /* Chat header */
+    .chat-container .header {
+      background: #075e54;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 16px 16px 0 0;
+      user-select: none;
+    }
+    .chat-container .header svg {
+      flex-shrink: 0;
+    }
+    .chat-container .header-title {
+      letter-spacing: 0.03em;
+    }
+
+    /* Chat messages */
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      background: #ece5dd;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 75%;
+      padding: 12px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+    .message .name {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 3px;
+      color: #555;
+    }
+    .incoming {
+      background: #ffffff;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+    }
+    .outgoing {
+      background: #dcf8c6;
+      align-self: flex-end;
+      border-top-right-radius: 0;
+    }
+
+    /* Input area */
+    .input-area {
+      display: flex;
+      padding: 12px;
+      background: #f0f0f0;
+      border-top: 1px solid #ccc;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 25px;
+      border: none;
+      font-size: 15px;
+      outline: none;
+      background: #ffffff;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .input-area button {
+      margin-left: 12px;
+      padding: 12px 22px;
+      font-size: 15px;
+      background: #075e54;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      .chat-container, .name-screen {
+        width: 98vw;
+        height: 95vh;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Name Input Screen -->
+  <div class="name-screen active" id="name-screen">
+    <div class="header">🌐 Welcome to WaveChat</div>
+    <div class="name-input-area">
+      <input type="text" id="nameInput" placeholder="Enter your name..." />
+      <button onclick="enterChat()">Enter Chat</button>
+    </div>
+  </div>
+
+  <!-- Chat Screen -->
+  <div class="chat-container" id="chat-container">
+    <div class="header">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="feather feather-message-circle"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+        style="margin-right: 12px;"
+      >
+        <path d="M21 11.5a8.38 8.38 0 0 1-1.9 5.4 8.5 8.5 0 0 1-6.6 3.1 8.38 8.38 0 0 1-5.4-1.9L3 21l1.9-4.1a8.38 8.38 0 0 1-1.9-5.4 8.5 8.5 0 0 1 3.1-6.6 8.38 8.38 0 0 1 5.4-1.9 8.5 8.5 0 0 1 6.6 3.1 8.38 8.38 0 0 1 1.9 5.4z"></path>
+      </svg>
+      <span class="header-title">WaveChat</span>
+    </div>
+    <div class="chat-box" id="chat-box"></div>
+    <form id="form" class="input-area">
+      <input id="input" autocomplete="off" placeholder="Type a message..." />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const nameScreen = document.getElementById("name-screen");
+    const chatContainer = document.getElementById("chat-container");
+    const chatBox = document.getElementById("chat-box");
+    const input = document.getElementById("input");
+    const form = document.getElementById("form");
+
+    let userName = "";
+    const socket = io();
+
+    function enterChat() {
+      const inputName = document.getElementById("nameInput").value.trim();
+      if (inputName !== "") {
+        userName = inputName;
+        nameScreen.classList.remove("active");
+        chatContainer.classList.add("active");
+      }
+    }
+
+    function addMessage(msg, isMine) {
+      const div = document.createElement("div");
+      div.classList.add("message");
+      div.classList.add(isMine ? "outgoing" : "incoming");
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "name";
+      nameEl.textContent = msg.name;
+
+      const textEl = document.createElement("div");
+      textEl.textContent = msg.text;
+
+      div.appendChild(nameEl);
+      div.appendChild(textEl);
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (text) {
+        const msg = { name: userName, text };
+        addMessage(msg, true);
+        socket.emit("chat message", msg);
+        input.value = "";
+      }
+    });
+
+    socket.on("chat message", (msg) => {
+      if (msg.name !== userName) {
+        addMessage(msg, false);
+      }
+    });
+  </script>
+</body>
+</html>
